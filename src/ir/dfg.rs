@@ -105,6 +105,8 @@ impl DataFlowGraph {
     for bb in old.kind().bb_uses() {
       self.bb_mut(bb).used_by.remove(&value);
     }
+    let mut data = data;
+    data.used_by = old.used_by;
     for v in data.kind().value_uses() {
       data_mut!(self, v).used_by.insert(value);
     }
