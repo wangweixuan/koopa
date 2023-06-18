@@ -134,6 +134,22 @@ impl DataFlowGraph {
     data
   }
 
+  /// Removes the given value. Returns the corresponding value data.
+  pub fn remove_value_unchecked(&mut self, value: Value) -> ValueData {
+    let data = self.values.remove(&value).expect("`value` does not exist");
+    for v in data.kind().value_uses() {
+      if let Some(v) = self.values.get_mut(&v) {
+        v.used_by.remove(&value);
+      }
+    }
+    for bb in data.kind().bb_uses() {
+      if let Some(bb) = self.bbs.get_mut(&bb) {
+          bb.used_by.remove(&value);
+      }
+    }
+    data
+  }
+
   /// Sets the name of the given value.
   ///
   /// # Panics
@@ -252,6 +268,19 @@ impl DataFlowGraph {
         param.used_by.is_empty(),
         "basic block parameter is used by other values"
       );
+    }
+    data
+  }
+
+  /// Removes the given basic block, also removes all basic block
+  /// parameters. Returns the corresponding basic block data.
+  pub fn remove_bb_unchecked(&mut self, bb: BasicBlock) -> BasicBlockData {
+    let data = self.bbs.remove(&bb).expect("`bb` does not exist");
+    for p in data.params() {
+      let _param = self
+        .values
+        .remove(p)
+        .expect("basic block parameter does not exist");
     }
     data
   }
