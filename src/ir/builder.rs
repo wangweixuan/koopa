@@ -224,6 +224,11 @@ pub trait LocalInstBuilder: ValueBuilder {
     self.insert_value(Binary::new_data(op, lhs, rhs, lhs_ty))
   }
 
+  /// Creates a binary operation.
+  fn binary_unchecked(mut self, op: BinaryOp, lhs: Value, rhs: Value, ty: Type) -> Value {
+    self.insert_value(Binary::new_data(op, lhs, rhs, ty))
+  }
+
   /// Creates a conditional branch with the given condition and targets.
   ///
   /// # Panics
